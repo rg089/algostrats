@@ -1,0 +1,14 @@
+training_steps: 700000
+synthetic: true
+simple: true
+weeks: 20
+win: 5
+features: 2 # 0 denotes no features, 1 denotes without symbolic, 2 denotes with symbolic
+top_k: 50
+loadfeed: false
+datafeed: true
+deploy: true
+use_alt: false
+datafile: ''
+datafile_test: 'realdata/augdata_01-Dec-2021_5m.csv'
+modelname: 'hp_11.pth'

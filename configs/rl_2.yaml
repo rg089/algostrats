@@ -1,0 +1,14 @@
+training_steps: 500000
+synthetic: false
+simple: false
+weeks: 20
+win: 5
+features: 2 # 0 denotes no features, 1 denotes without symbolic, 2 denotes with symbolic
+top_k: 50
+loadfeed: false
+datafeed: true
+deploy: true
+use_alt: false
+datafile: 'realdata/augdata_01-Jan-2022_5m.csv'
+datafile_test: 'realdata/augdata_02-Mar-2022_5m.csv'
+modelname: 'real_data_model.pth'

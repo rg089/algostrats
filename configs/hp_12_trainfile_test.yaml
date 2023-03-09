@@ -1,0 +1,13 @@
+training_steps: 700000
+synthetic: true
+simple: true
+weeks: 20
+win: 10
+features: 2 # 0 denotes no features, 1 denotes without symbolic, 2 denotes with symbolic
+top_k: 50
+loadfeed: true
+datafeed: false
+deploy: true
+use_alt: false
+datafile: ''
+loadfile: '../algodata/btfeed_hp_12.pkl'

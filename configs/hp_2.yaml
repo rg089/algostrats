@@ -1,0 +1,12 @@
+training_steps: 200000
+synthetic: true
+simple: true
+weeks: 4
+win: 5
+features: 2 # 0 denotes no features, 1 denotes without symbolic, 2 denotes with symbolic
+top_k: 50
+loadfeed: false
+datafeed: false
+deploy: true
+use_alt: false
+datafile: ''
