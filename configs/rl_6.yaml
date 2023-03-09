@@ -10,5 +10,5 @@ datafeed: true
 deploy: true
 use_alt: false
 datafile: 'realdata/augdata_02-May-2022_5m.csv'
-datafile_test: 'realdata/augdata_01-Jan-2022_5m.csv'
+datafile_test: 'realdata/augdata_04-Apr-2022_5m.csv'
 modelname: 'real_data_model_6.pth'
