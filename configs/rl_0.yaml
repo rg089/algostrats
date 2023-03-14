@@ -1,0 +1,47 @@
+# Train
+
+training_steps: 400000
+synthetic: false
+simple: false
+epochs: 1
+weeks: 20
+win: 5
+features: 2 # 0 denotes no features, 1 denotes without symbolic, 2 denotes with symbolic
+top_k: 50
+loadfeed: false
+datafeed: true
+deploy: true
+use_alt: false
+datafile: ['realdata/augdata_01-Dec-2021_5m.csv', 
+          'realdata/augdata_01-Jan-2022_5m.csv',
+          'realdata/augdata_03-Feb-2022_5m.csv',
+          'realdata/augdata_02-Mar-2022_5m.csv', 
+          'realdata/augdata_04-Apr-2022_5m.csv', 
+          'realdata/augdata_02-May-2022_5m.csv',
+          'realdata/augdata_03-Jun-2022_5m.csv',  
+          'realdata/augdata_04-Jul-2022_5m.csv',
+          'realdata/augdata_16-Dec-2022_5m.csv']
+modelname: 'real_data_model.pth'
+
+# Test
+
+datafile_test: ['realdata/augdata_01-Dec-2021_5m.csv', 
+          'realdata/augdata_01-Jan-2022_5m.csv',
+          'realdata/augdata_03-Feb-2022_5m.csv',
+          'realdata/augdata_02-Mar-2022_5m.csv', 
+          'realdata/augdata_04-Apr-2022_5m.csv', 
+          'realdata/augdata_02-May-2022_5m.csv',  
+          'realdata/augdata_04-Jul-2022_5m.csv',
+          'realdata/augdata_16-Dec-2022_5m.csv']
+
+model_suffixes: ['',
+                '_1_1',
+                '_1_2',
+                '_1_3',
+                '_1_4',
+                '_1_5',
+                '_1_6',
+                '_1_7',
+                '_1_8',
+                '_1_9'
+                ]

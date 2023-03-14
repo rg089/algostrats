@@ -13,3 +13,8 @@ def extract_suffix(fpath):
     
     suffix = basepath.rstrip('.yaml')
     return suffix
+
+
+def remove_extension(fname):
+    idx = fname.rfind('.')
+    return fname[:idx], fname[idx:]
