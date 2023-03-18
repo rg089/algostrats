@@ -5,7 +5,7 @@ weeks: 20
 win: 5
 features: 2 # 0 denotes no features, 1 denotes without symbolic, 2 denotes with symbolic
 top_k: 50
-loadfeed: true
+loadfeed: false
 datafeed: false
 deploy: true
 use_alt: false

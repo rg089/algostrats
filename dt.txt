@@ -1,0 +1,100 @@
+                                                                                                                        height >= 172
+                                                                                                                        Gini: 0.46619999999999995
+                                                                                                                        Samples: 100
+                                                                                                                        Values: {'yes': 63, 'no': 37}
+                                                                                                                        Class: yes
+                                                                                                                        
+
+
+
+
+
+
+
+                                        weight >= 91
+                                        Gini: 0.17999999999999994
+                                        Samples: 70
+                                        Values: {'yes': 63, 'no': 7}
+                                        Class: yes
+                                        
+
+
+
+
+
+
+
+                                                                                                                                                                Gini: 0.0
+                                                                                                                                                                Samples: 30
+                                                                                                                                                                Values: {'no': 30}
+                                                                                                                                                                Class: no
+                                                                                                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+height >= 190
+Gini: 0.375
+Samples: 8
+Values: {'no': 6, 'yes': 2}
+Class: no
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                weight >= 90
+                                                                                Gini: 0.031737773152965554
+                                                                                Samples: 62
+                                                                                Values: {'yes': 61, 'no': 1}
+                                                                                Class: yes
+                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
