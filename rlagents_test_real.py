@@ -110,7 +110,7 @@ config_path = args.config_path
 
 config = read_yaml(config_path)
 
-print(f'[INFO] The columns in RLAgents are: {COLS}!')
+# print(f'[INFO] The columns in RLAgents are: {COLS}!')
 
 DATAPATH='algodata'
 if not os.path.exists(DATAPATH):
@@ -141,8 +141,10 @@ use_alt_data = config['use_alt']
 datafiles = config.get('datafile_test', [])
 win = config['win']
 top_k = config['top_k']
+use_raw_features = config.get('old_features', True)
+use_new_features = config.get('new_features', False)
 
-datafeed_path = os.path.join('..', 'algodata', 'realdata', f'datafeed_{config_suffix}.pkl')
+# datafeed_path = os.path.join('..', 'algodata', 'realdata', f'datafeed_{config_suffix}.pkl')
 loadfeed_path = config.get('loadfile', '')
 if not loadfeed or not loadfeed_path:
     loadfeed_path = os.path.join('..', 'algodata', f'btfeed_{config_suffix}_test.pkl') # Path to save
@@ -160,7 +162,10 @@ def stringify(x):
 if type(datafiles) ==  str:
     datafiles = [datafiles]
     
-for datafile in datafiles:        
+for datafile in datafiles:
+    datafile_suffix = os.path.basename(datafile).rstrip('.csv')
+    datafeed_path = os.path.join('..', 'algodata', 'realdata', 
+                f'datafeed_{datafile_suffix}_{use_raw_features}_{use_new_features}.pkl')       
     if not loadfeed and not datafeed:
         data=pd.read_csv('./capvol100.csv')
         tickers=list(data.iloc[0:top_k]['ticker'].values)
@@ -183,23 +188,27 @@ for datafile in datafiles:
         print(f'[INFO] Loaded feed from the pickle file: {loadfeed_path}')
 
     if not loadfeed and datafeed:
+        if os.path.exists(datafeed_path):
+            feed = pickle.load(open(datafeed_path, 'rb'))
+            print(f'[INFO] Loading pickle file for datafeed from {datafeed_path}!')
+        else:
         #DATAFILE=DATAPATH+'augdata_'+date+'_5m.csv'
-        DATAFILE=os.path.join(DATAPATH, datafile)
-        print(f'Reading datafile: {DATAFILE}')
-        df=pd.read_csv(DATAFILE)
-        if 'Date' not in df.columns: 
-            print('Adding Date')
-            df['Date']=df.apply(stringify,axis=1)
-        print('Creating feed')
-        feed=DataFeed(tickers=list(df.ticker.unique()[0:10]),dfgiven=True,df=df)
-        print('Processing feed')
-        add_addl_features_feed(feed,tickers=feed.tickers)
-        add_sym_feature_feed(feed,tickers=feed.tickers)
-        # add_global_indices_feed(feed)
-        if not colab: 
-            with open(datafeed_path,'wb') as f: pickle.dump(feed,f)
-        elif colab: 
-            with open('/tmp/btdatafeed.pickle','wb') as f: pickle.dump(feed,f)
+            DATAFILE=os.path.join(DATAPATH, datafile)
+            print(f'Reading datafile: {DATAFILE}')
+            df=pd.read_csv(DATAFILE)
+            if 'Date' not in df.columns: 
+                print('Adding Date')
+                df['Date']=df.apply(stringify,axis=1)
+            print('Creating feed')
+            feed=DataFeed(tickers=list(df.ticker.unique()[0:10]),dfgiven=True,df=df)
+            print('Processing feed')
+            add_addl_features_feed(feed,tickers=feed.tickers)
+            add_sym_feature_feed(feed,tickers=feed.tickers)
+            # add_global_indices_feed(feed)
+            if not colab: 
+                with open(datafeed_path,'wb') as f: pickle.dump(feed,f)
+            elif colab: 
+                with open('/tmp/btdatafeed.pickle','wb') as f: pickle.dump(feed,f)
             
     elif loadfeed and datafeed:
         if not colab: 
@@ -219,7 +228,7 @@ for datafile in datafiles:
         
         use_alt_data=False
         agent=RLStratAgentDyn(algorithm,monclass=Mon,soclass=StackedObservations,verbose=1,win=win,
-                        metarl=True,myargs=(n_steps,use_alt_data))
+                        metarl=True,myargs=(n_steps,use_alt_data), use_cols=COLS)
         agent.use_memory=True #depends on whether RL algorithm uses memory for state computation
         agent.debug=False
         if use_alt_data: agent.set_alt_data(alt_data_func=get_alt_data_live)

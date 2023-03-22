@@ -36,14 +36,4 @@ datafile_test: ['realdata/augdata_01-Dec-2021_5m.csv',
           'realdata/augdata_04-Jul-2022_5m.csv',
           'realdata/augdata_16-Dec-2022_5m.csv']
 
-model_suffixes: ['',
-                '_1_1',
-                '_1_2',
-                '_1_3',
-                '_1_4',
-                '_1_5',
-                '_1_6',
-                '_1_7',
-                '_1_8',
-                '_1_9'
-                ]
+model_suffixes: ['']
