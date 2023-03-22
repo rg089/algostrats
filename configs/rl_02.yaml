@@ -1,0 +1,42 @@
+# Common
+modelname: 'RLC0.pth'
+
+# Train
+
+training_steps: 7500
+synthetic: false
+simple: false
+epochs: 50
+weeks: 20
+win: 5
+features: 2 # 0 denotes no features, 1 denotes without symbolic, 2 denotes with symbolic
+top_k: 50
+loadfeed: false
+datafeed: true
+deploy: true
+use_alt: false
+datafile: ['realdata/augdata_01-Dec-2021_5m.csv', 
+          'realdata/augdata_01-Jan-2022_5m.csv',
+          'realdata/augdata_03-Feb-2022_5m.csv',
+          'realdata/augdata_02-Mar-2022_5m.csv', 
+          'realdata/augdata_04-Apr-2022_5m.csv', 
+          'realdata/augdata_02-May-2022_5m.csv',
+          'realdata/augdata_03-Jun-2022_5m.csv',  
+          'realdata/augdata_04-Jul-2022_5m.csv',
+          'realdata/augdata_16-Dec-2022_5m.csv']
+old_features: true
+new_features: false
+
+# Test
+
+datafile_test: ['realdata/augdata_01-Dec-2021_5m.csv', 
+          'realdata/augdata_01-Jan-2022_5m.csv',
+          'realdata/augdata_03-Feb-2022_5m.csv',
+          'realdata/augdata_02-Mar-2022_5m.csv', 
+          'realdata/augdata_04-Apr-2022_5m.csv', 
+          'realdata/augdata_02-May-2022_5m.csv',  
+          'realdata/augdata_04-Jul-2022_5m.csv',
+          'realdata/augdata_16-Dec-2022_5m.csv',
+          'realdata/alldata.csv']
+
+model_suffixes: ['']
