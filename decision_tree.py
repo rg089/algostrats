@@ -291,10 +291,9 @@ class DecisionTree:
         
         if node.left is not None:
             if node.left.leaf:
-                if node.left.measure >= impurity_thresh: 
+                if node.left.measure >= impurity_thresh:
                     node.left.action = set_action
-                    print(f'[INFO] Pruned leaf with index: {node.left.index} as \
-                          impurity={node.left.measure}')
+                    print(f'[INFO] Pruned leaf with index: {node.left.index} as impurity={node.left.measure}>=thresh={impurity_thresh}')
             else:
                 node.left = self.prune_leaves(node.left, impurity_thresh=impurity_thresh, 
                                               set_action=set_action)
@@ -304,7 +303,7 @@ class DecisionTree:
                 if node.right.measure >= impurity_thresh: 
                     node.right.action = set_action
                     print(f'[INFO] Prune leaf with index: {node.right.index} as \
-                          impurity={node.right.measure}')
+                          impurity={node.right.measure}>=thresh={impurity_thresh}')
             else:
                 node.right = self.prune_leaves(node.right, impurity_thresh=impurity_thresh,
                                                set_action=set_action)
@@ -315,7 +314,7 @@ class DecisionTree:
         if impurity_thresh is None:
             pass
         else:
-            self.tree = self.prune_leaves(self.tree, set_action=set_action)
+            self.tree = self.prune_leaves(self.tree, impurity_thresh=impurity_thresh, set_action=set_action)
             print('[INFO] Pruning complete!')
         
 
