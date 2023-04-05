@@ -53,12 +53,13 @@ def discretize(df, col):
     # df[f'{col}_discrete'] = df[f'{col}_val'] + df[f'{col}_polarity']
     return df, [f'{col}_val', f'{col}_polarity'] #, f'{col}_discrete']
 
-def add_features(feed):
-    columns_to_use = ['Open', 'High', 'Low', 'Close', 'Volume', 'row_num', 'Open_n', 
-                  'High_n', 'Low_n', 'Close_n', 'Volume_n', 'SMA_10',
-       'SMA_20', 'VOL_SMA_20', 'RSI_14', 'BBL_5_2.0', 'BBM_5_2.0', 'BBU_5_2.0',
-       'BBB_5_2.0', 'BBP_5_2.0', 'MACD_12_26_9', 'MACDh_12_26_9',
-       'MACDs_12_26_9', 'VWAP_D', 'MOM_30', 'CMO_14']
+def add_features(feed, columns_to_use=None):
+    if columns_to_use is None:
+        columns_to_use = ['Open', 'High', 'Low', 'Close', 'Volume', 'row_num', 'Open_n', 
+                    'High_n', 'Low_n', 'Close_n', 'Volume_n', 'SMA_10',
+        'SMA_20', 'VOL_SMA_20', 'RSI_14', 'BBL_5_2.0', 'BBM_5_2.0', 'BBU_5_2.0',
+        'BBB_5_2.0', 'BBP_5_2.0', 'MACD_12_26_9', 'MACDh_12_26_9',
+        'MACDs_12_26_9', 'VWAP_D', 'MOM_30', 'CMO_14']
         
     subtract_col_names = [('High', 'Low'), ('Open', 'Close'), ('SMA_20', 'SMA_10'), ('Open_n', 'Close_n'), ('High_n', 'Low_n'), ('Open', 'High')]
     subtract_cols = []
