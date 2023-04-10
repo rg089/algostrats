@@ -22,12 +22,13 @@ from featfuncs import feat_aug,add_addl_features_feed,add_ta_features_feed,add_s
 from featfuncs import add_global_indices_feed
 from feed_env import Episode
 import aspectlib
-from rlagents import RLStratAgentDyn
+from rlagents import RLStratAgentDyn, COLS, RLStratAgentDynFeatures
 from backtest import Backtest
 from feeds import BackFeed,DataFeed
 from validation import Validate
 import pickle
 import plotly.express as px
+from india_calendar import IBDay
 import plotly
 from add_features import add_features
 
@@ -69,44 +70,37 @@ use_new_features = config.get('new_features', False)
 
 if not loadfeed or not loadfeed_path:
     loadfeed_path = os.path.join('..', 'algodata', f'btfeed_{config_suffix}.pkl') # Path to save
-
-# print(f'[INFO] The columns in RLAgents are: {COLS}!')
+    
+modelname = f'{modelname.rstrip(".pth")}_{use_raw_features}_{use_new_features}.pth'
 
 colab=False
-script=True
+n_steps=2048
 
-n_steps=2048 # reduce for debugging only else 2048
-
-OHLCV_COLS=['Open_n','High_n','Low_n','Close_n','Volume_n']
-TA_COLS=['SMA_10', 'SMA_20','VOL_SMA_20','RSI_14','BBL_5_2.0','BBM_5_2.0','BBU_5_2.0',
-       'BBB_5_2.0', 'BBP_5_2.0','MACD_12_26_9','MACDh_12_26_9','MACDs_12_26_9','VWAP_D',
-        'MOM_30','CMO_14']
-TA_COLS_MIN=['SMA_10', 'SMA_20','CMO_14']
-# COLS=['row_num']+OHLCV_COLS+TA_COLS
-COLS=['row_num']+OHLCV_COLS+TA_COLS
-
-cols_to_use = []
-if use_raw_features:
-    cols_to_use += COLS
+with open('additional_utils/cols.pkl', 'rb') as f:
+        d = pickle.load(f)
+imp_cols = d['imp_cols']
+cols_to_use = d['cols_to_use']
 
 def stringify(x):
     return pd.to_datetime(x['Datetime']).strftime('%d-%b-%Y')
 
-def add_features_to_feed(feed):
-    global cols_to_use
-    for ticker in feed.data:
-        df = feed.data[ticker]
-        df, pre_discrete_cols, discrete_cols = add_features(df)
-        feed.data[ticker] = df
-        if use_new_features:
-            cols_to_use += [col for col in discrete_cols if col not in cols_to_use]
-    return feed
 
 if type(datafiles) == str: 
     datafiles = [datafiles]
-    
-printed_cols = False
-    
+
+   
+if use_new_features and use_raw_features:
+    using_cols = COLS + imp_cols
+elif use_raw_features:
+    using_cols = COLS
+elif use_new_features:
+    using_cols = imp_cols
+
+continuing_cols = using_cols + ['Date', 'datetime']
+needed_cols = ['row_num', 'Close_n', 'Open_n']
+for col in needed_cols:
+    if col not in continuing_cols: continuing_cols.append(col)
+
 for epoch in range(epochs):
     for idx, datafile in enumerate(datafiles):
         print(f'[INFO] EPOCH: {epoch} FILE: {datafile}!')
@@ -114,73 +108,84 @@ for epoch in range(epochs):
         datafile_suffix = os.path.basename(datafile).rstrip('.csv')
         datafeed_path = os.path.join('..', 'algodata', 'realdata', 
                 f'datafeed_{datafile_suffix}_{use_raw_features}_{use_new_features}.pkl')
-        
-        if not loadfeed and not datafeed:
-            data=pd.read_csv('./capvol100.csv')
-            tickers=list(data.iloc[0:50]['ticker'].values)
+
+        if os.path.exists(datafeed_path):
+            feed = pickle.load(open(datafeed_path, 'rb'))
+            print('[INFO] Loading pickle file for datafeed!')
+            
+            for t in feed.ndata:
+                for d in feed.ndata[t]:
+                    if feed.ndata[t][d].isnull().values.any(): 
+                        feed.ndata[t][d]=feed.ndata[t][d].fillna(1)
+                        # print(t,d)
+                    if feed.ndata[t][d].isin([-np.inf,np.inf]).values.any():
+                        feed.ndata[t][d]=feed.ndata[t][d].replace([np.inf, -np.inf],1)
+                        
+        else:
+            DATAFILE=os.path.join(DATAPATH, datafile)
+            print(f'Reading datafile: {DATAFILE}')
+            df=pd.read_csv(DATAFILE)
+            
+            if 'Date' not in df.columns: 
+                print('Adding Date')
+                df['Date']=df.apply(stringify,axis=1)
+
             print('Creating feed')
-            feed=BackFeed(tickers=tickers,nd=nd,nw=nw,interval='5m',synthetic=synthetic,simple=simple)
+            feed=DataFeed(tickers=list(df.ticker.unique()[0:10]),dfgiven=True,df=df)
+            
             print('Processing feed')
             add_addl_features_feed(feed,tickers=feed.tickers)
             add_sym_feature_feed(feed,tickers=feed.tickers)
-            if use_new_features:
-                feed = add_features_to_feed(feed)
-            if not synthetic: add_global_indices_feed(feed)
-            if not colab: 
-                with open(loadfeed_path,'wb') as f: pickle.dump(feed,f)
-                
-        elif loadfeed and not datafeed:
-            if not colab: 
-                with open('../../temp_data/btfeed.pickle','rb') as f: feed=pickle.load(f)
-            elif colab: 
-                with open(loadfeed_path,'rb') as f: feed=pickle.load(f)
-            print(f'[INFO] Loaded feed from the pickle file: {loadfeed_path}')
 
-        if not loadfeed and datafeed:
-            if os.path.exists(datafeed_path):
-                feed = pickle.load(open(datafeed_path, 'rb'))
-                print('[INFO] Loading pickle file for datafeed!')
-            else:
-                DATAFILE=os.path.join(DATAPATH, datafile)
-                print(f'Reading datafile: {DATAFILE}')
-                df=pd.read_csv(DATAFILE)
-                if 'Date' not in df.columns: 
-                    print('Adding Date')
-                    df['Date']=df.apply(stringify,axis=1)
-                print('Creating feed')
-                feed=DataFeed(tickers=list(df.ticker.unique()[0:10]),dfgiven=True,df=df)
-                print('Processing feed')
-                add_addl_features_feed(feed,tickers=feed.tickers)
-                add_sym_feature_feed(feed,tickers=feed.tickers)
-                if use_new_features:
-                    feed = add_features_to_feed(feed)
-                # add_global_indices_feed(feed)
-                if not colab: 
-                    with open(datafeed_path,'wb') as f: pickle.dump(feed,f)
-                elif colab: 
-                    with open('/tmp/btdatafeed.pickle','wb') as f: pickle.dump(feed,f)
+            if use_new_features:
+                for ticker in feed.data:
+                    df = feed.data[ticker]
+                    df, pre_discrete_cols, discrete_cols = add_features(df, columns_to_use=cols_to_use)
+                    feed.data[ticker] = df.loc[:, continuing_cols]
+                    
+                feed.ndata={}
+                for t in feed.tickers:
+                    print(f'[INFO] On ticker={t}')
+                    dfa=feed.data[t]
+                    dfL=[]
+                    feed.ndata[t]={}
+                    for d in dfa['Date'].unique():
+                        pdt=pd.to_datetime(d)
+                        pdtp=pdt-IBDay(1)
+                        df=dfa.loc[(pd.to_datetime(dfa['Date'])<=pdt)&
+                                    (pd.to_datetime(dfa['Date'])>=pdtp)]
+                        df['row_num'] = np.arange(len(df))
+                        df=df[~df.index.duplicated(keep='first')]
+                        df=df.sort_index()
+                        feed.ndata[t][d]=df
+                        
+            for t in feed.ndata:
+                for d in feed.ndata[t]:
+                    if feed.ndata[t][d].isnull().values.any(): 
+                        feed.ndata[t][d]=feed.ndata[t][d].fillna(1)
+                        # print(t,d)
+                    if feed.ndata[t][d].isin([-np.inf,np.inf]).values.any():
+                        feed.ndata[t][d]=feed.ndata[t][d].replace([np.inf, -np.inf],1)
                 
-        elif loadfeed and datafeed:
             if not colab: 
-                with open('../../temp_data/btdatafeed.pickle','rb') as f: feed=pickle.load(f)
-            elif colab:
-                with open('/tmp/btdatafeed.pickle','rb') as f: feed=pickle.load(f)
+                with open(datafeed_path,'wb') as f: pickle.dump(feed,f)
+            elif colab: 
+                with open('/tmp/btdatafeed.pickle','wb') as f: pickle.dump(feed,f)
+
                 
-        if not printed_cols:
-            print(f'[INFO] Use raw features: {use_raw_features}, Use new features: {use_new_features}')
-            print(f'Finally using: total {len(cols_to_use)}) columns (last 100: {cols_to_use[-100:]})!')                
+        print(f'[INFO] Use raw features: {use_raw_features}, Use new features: {use_new_features}') 
+        print(f'Using: {len(using_cols)} COLS! Ex: {using_cols[:7]+using_cols[-7:]}')              
 
         def get_alt_data_live():
             aD={'gdata':feed.gdata}
             return aD
 
-        agent=RLStratAgentDyn(algorithm,monclass=Mon,soclass=StackedObservations,verbose=1,win=win,
-                        metarl=True,myargs=(n_steps,use_alt_data), use_cols=cols_to_use)
+        agent=RLStratAgentDynFeatures(algorithm,monclass=Mon,soclass=StackedObservations,verbose=1,win=win,
+                        metarl=True,myargs=(n_steps,use_alt_data), using_cols=using_cols)
         agent.use_memory=True #depends on whether RL algorithm uses memory for state computation
         agent.debug=False
-        agent.data_cols = ['datetime', 'Date'] + cols_to_use
-        if use_alt_data: agent.set_alt_data(alt_data_func=get_alt_data_live)
-
+        
+        agent.data_cols = continuing_cols
 
         if modelname and os.path.exists('./saved_models/'+modelname): 
             agent.load_model(filepath='./saved_models/'+modelname)
@@ -195,7 +200,6 @@ for epoch in range(epochs):
             return state,rew,done,exit_type
 
         aspectlib.weave(Episode, my_decorator, methods='env_step')
-
 
         bt=Backtest(feed,tickers=feed.tickers,add_features=False,target=5,stop=5,txcost=0.001,
                     loc_exit=True,scan=True,topk=5,deploy=deploy,save_dfs=False,
@@ -225,11 +229,9 @@ for epoch in range(epochs):
 
         if modelname: 
             torch.save(agent.model.policy.state_dict(),'./saved_models/'+modelname)
-            modelname_current = modelname.rstrip('.pth') + f'_{epoch+1}_file_{idx+1}.pth'
-            torch.save(agent.model.policy.state_dict(),'./saved_models/'+modelname_current)
 
         train_results_folder = os.path.join('results', f'{config_suffix}',
-                                            'training', f'epoch_{epoch+1}_{idx+1}')
+                                            'training')
         os.makedirs(train_results_folder, exist_ok=True)
 
         df=pd.read_csv('/tmp/aiagents.monitor.csv',comment='#')
