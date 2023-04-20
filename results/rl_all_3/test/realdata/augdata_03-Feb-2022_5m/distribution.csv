@@ -1,0 +1,4 @@
+file,reward
+realdata/augdata_01-Dec-2021_5m.csv,0.2±1.0
+realdata/augdata_01-Jan-2022_5m.csv,-0.1±0.9
+realdata/augdata_03-Feb-2022_5m.csv,-0.2±1.3

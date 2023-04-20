@@ -65,6 +65,8 @@ def add_features(feed, columns_to_use=None):
     subtract_cols = []
 
     for cols in subtract_col_names:
+        if cols[0] not in columns_to_use or cols[1] not in columns_to_use:
+            continue
         feed, added_col = difference_cols(feed, cols[0], cols[1])
         subtract_cols.append(added_col)
         

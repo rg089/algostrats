@@ -1,0 +1,12 @@
+file,ticker,reward
+realdata/alldata.csv,NELCAST.NS,-0.05±1.10
+realdata/alldata.csv,AARTIDRUGS.NS,-0.08±0.92
+realdata/alldata.csv,CYIENT.NS,0.19±0.84
+realdata/alldata.csv,HINDZINC.NS,0.02±0.90
+realdata/alldata.csv,TRENT.NS,-0.16±0.90
+realdata/alldata.csv,TATAELXSI.NS,-0.08±1.10
+realdata/alldata.csv,MINDTREE.NS,-0.01±1.35
+realdata/alldata.csv,TI.NS,0.20±1.67
+realdata/alldata.csv,OBEROIRLTY.NS,-0.02±1.08
+realdata/alldata.csv,SOMANYCERA.NS,0.03±1.42
+realdata/alldata.csv,overall,0.01±1.16

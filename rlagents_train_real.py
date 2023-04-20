@@ -67,6 +67,10 @@ loadfeed_path = config.get('loadfile', '')
 epochs = config.get('epochs', 1)
 use_raw_features = config.get('old_features', True)
 use_new_features = config.get('new_features', False)
+create_feed = config.get('create_feed', False)
+dynamic_test = config.get('dynamic_test_features', False)
+use_prediscrete = config.get('use_prediscrete', False)
+
 
 if not loadfeed or not loadfeed_path:
     loadfeed_path = os.path.join('..', 'algodata', f'btfeed_{config_suffix}.pkl') # Path to save
@@ -80,6 +84,11 @@ with open('additional_utils/cols.pkl', 'rb') as f:
         d = pickle.load(f)
 imp_cols = d['imp_cols']
 cols_to_use = d['cols_to_use']
+prediscrete_imp_cols = d['prediscrete_imp_cols']
+
+if use_prediscrete:
+    imp_cols = prediscrete_imp_cols
+
 
 def stringify(x):
     return pd.to_datetime(x['Datetime']).strftime('%d-%b-%Y')
@@ -107,9 +116,9 @@ for epoch in range(epochs):
         
         datafile_suffix = os.path.basename(datafile).rstrip('.csv')
         datafeed_path = os.path.join('..', 'algodata', 'realdata', 
-                f'datafeed_{datafile_suffix}_{use_raw_features}_{use_new_features}.pkl')
+                f'datafeed_{datafile_suffix}_{use_raw_features}_{use_new_features}_{use_prediscrete}.pkl')
 
-        if os.path.exists(datafeed_path):
+        if os.path.exists(datafeed_path) and not create_feed:
             feed = pickle.load(open(datafeed_path, 'rb'))
             print('[INFO] Loading pickle file for datafeed!')
             
@@ -157,6 +166,8 @@ for epoch in range(epochs):
                         df['row_num'] = np.arange(len(df))
                         df=df[~df.index.duplicated(keep='first')]
                         df=df.sort_index()
+                        dfc=df.loc[df['Date']==d]
+                        feed.offsets[t][d]=df.shape[0]-dfc.shape[0]
                         feed.ndata[t][d]=df
                         
             for t in feed.ndata:
@@ -237,5 +248,5 @@ for epoch in range(epochs):
         df=pd.read_csv('/tmp/aiagents.monitor.csv',comment='#')
         df.to_csv(os.path.join(train_results_folder, 'training_monitor.csv'), index=False)
 
-        fig = px.line(df['r'].rolling(window=10).mean().values)
+        fig = px.line(df['r'].rolling(window=500).mean().values)
         plotly.offline.plot(fig, filename=os.path.join(train_results_folder, 'train_curve.html'))

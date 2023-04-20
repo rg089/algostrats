@@ -21,14 +21,15 @@ new_features: True
 
 # Test
 
-datafile_test: ['realdata/augdata_01-Dec-2021_5m.csv', 
-          'realdata/augdata_01-Jan-2022_5m.csv',
-          'realdata/augdata_03-Feb-2022_5m.csv',
-          'realdata/augdata_02-Mar-2022_5m.csv', 
-          'realdata/augdata_04-Apr-2022_5m.csv', 
-          'realdata/augdata_02-May-2022_5m.csv',  
-          'realdata/augdata_04-Jul-2022_5m.csv',
-          'realdata/augdata_16-Dec-2022_5m.csv',
+datafile_test: [
+          # 'realdata/augdata_01-Dec-2021_5m.csv', 
+          # 'realdata/augdata_01-Jan-2022_5m.csv',
+          # 'realdata/augdata_03-Feb-2022_5m.csv',
+          # 'realdata/augdata_02-Mar-2022_5m.csv', 
+          # 'realdata/augdata_04-Apr-2022_5m.csv', 
+          # 'realdata/augdata_02-May-2022_5m.csv',  
+          # 'realdata/augdata_04-Jul-2022_5m.csv',
+          # 'realdata/augdata_16-Dec-2022_5m.csv',
           'realdata/alldata.csv']
 
 # model_suffixes: ['']
