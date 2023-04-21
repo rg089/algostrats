@@ -1,0 +1,12 @@
+file,ticker,reward
+backfeed_False_False_8w.pkl,RELIANCE.NS,0.09±0.88
+backfeed_False_False_8w.pkl,ADANITRANS.NS,-0.27±3.00
+backfeed_False_False_8w.pkl,DMART.NS,0.01±1.25
+backfeed_False_False_8w.pkl,ADANIGREEN.NS,0.42±3.35
+backfeed_False_False_8w.pkl,NESTLEIND.NS,-0.50±0.95
+backfeed_False_False_8w.pkl,ULTRACEMCO.NS,0.06±0.90
+backfeed_False_False_8w.pkl,KOTAKBANK.NS,-0.19±0.58
+backfeed_False_False_8w.pkl,TCS.NS,-0.38±0.89
+backfeed_False_False_8w.pkl,MARUTI.NS,-0.14±0.82
+backfeed_False_False_8w.pkl,NTPC.NS,0.18±0.83
+backfeed_False_False_8w.pkl,overall,-0.07±1.66
