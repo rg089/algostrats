@@ -106,7 +106,7 @@ elif use_new_features:
     using_cols = imp_cols
 
 continuing_cols = using_cols + ['Date', 'datetime']
-needed_cols = ['row_num', 'Close_n', 'Open_n']
+needed_cols = ['row_num', 'Close_n', 'Open_n', 'Open', 'Close', 'High', 'Low']
 for col in needed_cols:
     if col not in continuing_cols: continuing_cols.append(col)
 
@@ -140,7 +140,10 @@ for epoch in range(epochs):
                 df['Date']=df.apply(stringify,axis=1)
 
             print('Creating feed')
-            feed=DataFeed(tickers=list(df.ticker.unique()[0:10]),dfgiven=True,df=df)
+            
+            data=pd.read_csv('./capvolfiltered.csv')
+            tickers=[t for t in list(df['ticker'].unique()) if t in list(data['ticker'].values)]
+            feed=DataFeed(tickers=tickers,dfgiven=True,df=df)
             
             print('Processing feed')
             add_addl_features_feed(feed,tickers=feed.tickers)
@@ -191,8 +194,8 @@ for epoch in range(epochs):
             aD={'gdata':feed.gdata}
             return aD
 
-        agent=RLStratAgentDynFeatures(algorithm,monclass=Mon,soclass=StackedObservations,verbose=1,win=win,
-                        metarl=True,myargs=(n_steps,use_alt_data), using_cols=using_cols)
+        agent=RLStratAgentDynFeatures(algorithm,monclass=Mon,soclass=StackedObservations,verbose=1,
+                        metarl=True,myargs=(n_steps,use_alt_data,win), using_cols=using_cols)
         agent.use_memory=True #depends on whether RL algorithm uses memory for state computation
         agent.debug=False
         
@@ -213,7 +216,7 @@ for epoch in range(epochs):
         aspectlib.weave(Episode, my_decorator, methods='env_step')
 
         bt=Backtest(feed,tickers=feed.tickers,add_features=False,target=5,stop=5,txcost=0.001,
-                    loc_exit=True,scan=True,topk=5,deploy=deploy,save_dfs=False,
+                    loc_exit=True,scan=True,topk=10,deploy=deploy,save_dfs=False,
                     save_func=None)
 
         def run_btworld():

@@ -103,6 +103,16 @@ def combine_plotly_figs_to_html(plotly_figs, html_fname, include_plotlyjs='cdn',
         uri = pathlib.Path(html_fname).absolute().as_uri()
         webbrowser.open(uri)
         
+        
+def compute_avg_episode_rew(bt):
+    i,tot=0,0
+    for t in bt.results:
+        for d in bt.results[t]:
+            for r in bt.results[t][d]['rew']:
+                tot+=r[1]
+                i+=1
+    return tot/i,i,tot
+        
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--config_path", "-c", type=str, default="configs/config_base.yaml", help="Path to the config file")
@@ -191,9 +201,6 @@ rew_dist = {'file': [], 'ticker': [], 'reward': []}
 for datafile in datafiles:
     datafile_suffix = os.path.basename(datafile).rstrip('.csv')
     datafeed_path = os.path.join('..', 'algodata', 'realdata', 
-                f'datafeed_{datafile_suffix}_{use_raw_features}_{use_new_features}.pkl')
-    if use_prediscrete:
-        datafeed_path = os.path.join('..', 'algodata', 'realdata', 
                 f'datafeed_{datafile_suffix}_{use_raw_features}_{use_new_features}_{use_prediscrete}.pkl')   
 
     if (os.path.exists(datafeed_path)) and not create_feed:
@@ -269,8 +276,8 @@ for datafile in datafiles:
         return aD
     
     use_alt_data=False
-    agent=RLStratAgentDynFeatures(algorithm,monclass=Mon,soclass=StackedObservations,verbose=1,win=win,
-                    metarl=True,myargs=(n_steps,use_alt_data), using_cols=using_cols, dynamic_test=dynamic_test,
+    agent=RLStratAgentDynFeatures(algorithm,monclass=Mon,soclass=StackedObservations,verbose=1,
+                    metarl=True,myargs=(n_steps,use_alt_data, win), using_cols=using_cols, dynamic_test=dynamic_test,
                     cols_to_use=cols_to_use)
     agent.use_memory=True #depends on whether RL algorithm uses memory for state computation
     agent.debug=False
