@@ -3,7 +3,7 @@ modelname: 'RLC0.pth'
 
 # Train
 
-training_steps: 500000
+training_steps: 750000
 synthetic: false
 simple: false
 epochs: 1
@@ -17,6 +17,7 @@ deploy: true
 use_alt: false
 datafile: ['realdata/alldata.csv']
 old_features: True
+create_feed: True
 new_features: True
 
 # Test

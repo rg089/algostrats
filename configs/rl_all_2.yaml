@@ -1,5 +1,5 @@
 # Common
-modelname: 'RLC0.pth'
+modelname: 'RLC2W10.pth'
 
 # Train
 
@@ -8,7 +8,7 @@ synthetic: false
 simple: false
 epochs: 1
 weeks: 20
-win: 5
+win: 10
 features: [0,1,2]
 top_k: 50
 loadfeed: false
@@ -20,7 +20,7 @@ old_features: True
 new_features: False
 
 # Test
-
+modify_name: false
 datafile_test: [
           # 'realdata/augdata_01-Dec-2021_5m.csv', 
           # 'realdata/augdata_01-Jan-2022_5m.csv',

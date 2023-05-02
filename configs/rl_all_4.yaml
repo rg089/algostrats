@@ -3,7 +3,7 @@ modelname: 'RLC0_prediscrete.pth'
 
 # Train
 
-training_steps: 500000
+training_steps: 750000
 synthetic: false
 simple: false
 epochs: 1
@@ -19,6 +19,7 @@ datafile: ['realdata/alldata.csv']
 old_features: false
 new_features: true
 create_feed: false
+create_feed: True
 dynamic_test_features: false
 use_prediscrete: true
 
