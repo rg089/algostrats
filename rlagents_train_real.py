@@ -70,6 +70,7 @@ use_new_features = config.get('new_features', False)
 create_feed = config.get('create_feed', False)
 dynamic_test = config.get('dynamic_test_features', False)
 use_prediscrete = config.get('use_prediscrete', False)
+use_normalized =  config.get('use_normalized', False)
 
 
 if not loadfeed or not loadfeed_path:
@@ -85,6 +86,8 @@ with open('additional_utils/cols.pkl', 'rb') as f:
 imp_cols = d['imp_cols']
 cols_to_use = d['cols_to_use']
 prediscrete_imp_cols = d['prediscrete_imp_cols']
+imp_cols_n = d['imp_cols_n']
+
 
 if use_prediscrete:
     imp_cols = prediscrete_imp_cols
@@ -103,10 +106,11 @@ if use_new_features and use_raw_features:
 elif use_raw_features:
     using_cols = COLS
 elif use_new_features:
-    using_cols = imp_cols
+    if use_normalized: using_cols = imp_cols_n
+    else: using_cols = imp_cols
 
 continuing_cols = using_cols + ['Date', 'datetime']
-needed_cols = ['row_num', 'Close_n', 'Open_n', 'Open', 'Close', 'High', 'Low']
+needed_cols = ['row_num', 'Close_n', 'Open_n', 'Open', 'Close', 'High', 'Low', 'Open_n', 'High_n', 'Low_n', 'Volume_n']
 for col in needed_cols:
     if col not in continuing_cols: continuing_cols.append(col)
 
@@ -117,6 +121,8 @@ for epoch in range(epochs):
         datafile_suffix = os.path.basename(datafile).rstrip('.csv')
         datafeed_path = os.path.join('..', 'algodata', 'realdata', 
                 f'datafeed_{datafile_suffix}_{use_raw_features}_{use_new_features}_{use_prediscrete}.pkl')
+        if use_normalized:
+            datafeed_path = datafeed_path.replace('.pkl', '_normalized.pkl')
 
         if os.path.exists(datafeed_path) and not create_feed:
             feed = pickle.load(open(datafeed_path, 'rb'))

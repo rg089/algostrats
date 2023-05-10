@@ -118,6 +118,7 @@ DATAPATH='algodata'
 if not os.path.exists(DATAPATH):
     os.makedirs(DATAPATH)
 
+average = False
 algorithm=PPO # The algorithm to use
 synthetic= config['synthetic']
 simple= config['simple']
@@ -167,11 +168,14 @@ def stringify(x):
     return pd.to_datetime(x['Datetime']).strftime('%d-%b-%Y')
 
 datafiles = [
-    # 'backfeed_True_True_8w.pkl', 
+    # 'backfeed_True_True_8w.pkl' 
     # 'backfeed_True_False_8w.pkl'
     'backfeed_4w_False_False_1.pkl',
     ]
-    
+if 'synthetic_datafiles' in config:
+    datafiles = config['synthetic_datafiles']
+    average = True    
+
 if use_new_features and use_raw_features:
     using_cols = COLS + imp_cols
 elif use_raw_features:
@@ -202,6 +206,7 @@ for datafile in datafiles:
         print('Adding features to feed!')
         for ticker in feed.data:
             df = feed.data[ticker]
+            # print(ticker, df.shape)
             df, pre_discrete_cols, discrete_cols = add_features(df, columns_to_use=cols_to_use)
             feed.data[ticker] = df.loc[:, continuing_cols]
             

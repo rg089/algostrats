@@ -19,7 +19,7 @@ datafile: ['realdata/alldata.csv']
 old_features: false
 new_features: true
 create_feed: false
-create_feed: True
+create_feed: False
 dynamic_test_features: false
 use_prediscrete: true
 

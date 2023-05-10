@@ -75,13 +75,14 @@ tickers=list(data.iloc[0:10]['ticker'].values)
         
 paths = [
     'backfeed_True_True_8w.pkl', 
-    'backfeed_True_False_8w.pkl'
+    'backfeed_True_False_8w.pkl',
+    'backfeed_4w_False_False_1.pkl',
     ]
 
 
 for pickle_path in paths:
     print(f'[INFO] On file: {pickle_path}')
-    feed = pickle.load(open(os.path.join('..', 'algodata', pickle_path), 'rb'))
+    feed = pickle.load(open(os.path.join('..', 'algodata', 'backfeeds', pickle_path), 'rb'))
     for ticker in feed.data:
         df = feed.data[ticker]
         feed.data[ticker], _, _ = add_features(df, columns_to_use=cols_to_use)
@@ -91,8 +92,8 @@ for pickle_path in paths:
         if model_name not in final_data:
             final_data[model_name] = []
             
-        bt=Backtest(feed,tickers=feed.tickers,add_features=True,target=.001,stop=.01,txcost=0.001,
-                    loc_exit=True,scan=False,topk=5,deploy=True,save_dfs=False)
+        bt=Backtest(feed,tickers=feed.tickers,add_features=True,target=.05,stop=.01,txcost=0.001,
+                    loc_exit=True,scan=True,topk=5,deploy=True,save_dfs=False)
         dtStrat = DTStrat(model_path=f'saved_models/{model_name}')
         ans = []
 
@@ -102,4 +103,4 @@ for pickle_path in paths:
         
 print(final_data)
 df = pd.DataFrame(final_data, index=paths)
-df.to_csv('results/dt_on_synthetic.csv')
+df.to_csv('results/dt_on_backfeed.csv')

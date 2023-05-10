@@ -17,7 +17,7 @@ deploy: true
 use_alt: false
 datafile: ['realdata/alldata.csv']
 old_features: True
-create_feed: True
+create_feed: False
 new_features: True
 
 # Test

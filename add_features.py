@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def check_numeric(df, col):
     return df[col].dtype in ['float64', 'int64']
 
@@ -51,9 +52,9 @@ def discretize(df, col):
     df[f'{col}_val'] = df[col].apply(lambda x: 0 if x<=low_thresh else 2 if x>=high_thresh else 1)
     df[f'{col}_polarity'] = df[col].apply(lambda x: 1 if x>0 else -1)
     # df[f'{col}_discrete'] = df[f'{col}_val'] + df[f'{col}_polarity']
-    return df, [f'{col}_val', f'{col}_polarity'] #, f'{col}_discrete']
+    return df, [f'{col}_val', f'{col}_polarity'] #, f'{col}_discrete'
 
-def add_features(feed, columns_to_use=None):
+def add_features(feed, columns_to_use=None, do_discretization=True):
     if columns_to_use is None:
         columns_to_use = ['Open', 'High', 'Low', 'Close', 'Volume', 'row_num', 'Open_n', 
                     'High_n', 'Low_n', 'Close_n', 'Volume_n', 'SMA_10',
@@ -109,8 +110,13 @@ def add_features(feed, columns_to_use=None):
     pre_discrete_cols = pre_change_cols + change_cols
     discrete_cols = []
 
-    for col in pre_discrete_cols:
-        feed, added_cols = discretize(feed, col)
-        for added_col in added_cols: discrete_cols.append(added_col)
+    if do_discretization:
+        for col in pre_discrete_cols:
+            feed, added_cols = discretize(feed, col)
+            for added_col in added_cols: 
+                discrete_cols.append(added_col)
+    else:
+        pass
+        # Use the stored thresholds
         
     return feed, pre_discrete_cols, discrete_cols

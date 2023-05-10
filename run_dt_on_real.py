@@ -9,6 +9,7 @@ from decision_tree import DecisionTree
 import pickle
 import pandas as pd
 import warnings
+from india_calendar import IBDay
 warnings.simplefilter("ignore")
 # # upload rulestrats.ipynb 
 # from google.colab import files
@@ -70,40 +71,70 @@ def get_dist(bt):
 
 
 final_data = {}
-data=pd.read_csv('./capvol100.csv')
-tickers=list(data.iloc[0:10]['ticker'].values)
+# data=pd.read_csv('./capvolfiltered.csv')
+# tickers=list(data.iloc[0:10]['ticker'].values)
         
-paths = ['realdata/augdata_01-Jan-2022_5m.csv',
-            'realdata/augdata_03-Feb-2022_5m.csv',
-            'realdata/augdata_02-Mar-2022_5m.csv', 
-            'realdata/augdata_04-Apr-2022_5m.csv', 
-            'realdata/augdata_02-May-2022_5m.csv',  
-            'realdata/augdata_04-Jul-2022_5m.csv',
-            'realdata/augdata_16-Dec-2022_5m.csv',
+paths = [
+    # 'realdata/augdata_01-Jan-2022_5m.csv',
+    #         'realdata/augdata_03-Feb-2022_5m.csv',
+    #         'realdata/augdata_02-Mar-2022_5m.csv', 
+    #         'realdata/augdata_04-Apr-2022_5m.csv', 
+    #         'realdata/augdata_02-May-2022_5m.csv',  
+    #         'realdata/augdata_04-Jul-2022_5m.csv',
+    #         'realdata/augdata_16-Dec-2022_5m.csv',
             'realdata/alldata.csv']
 
 
 for pickle_path in paths:
     pickle_name = pickle_path.split("/")[-1].rstrip('.csv')
-    pickle_name1 = f'datafeed_{pickle_name}_True_True.pkl'
-    pickle_name2 = f'datafeed_{pickle_name}_True_False.pkl'
+    pickle_name1 = f'datafeed_{pickle_name}_False_True_False.pkl'
+    pickle_name2 = f'datafeed_{pickle_name}_True_False_False.pkl'
     
-    if os.path.exists(pickle_name1):
+    
+    if os.path.exists(os.path.join('..', 'algodata', 'realdata', pickle_name1)):
         feed = pickle.load(open(os.path.join('..', 'algodata', 'realdata', pickle_name1), 'rb'))
+        print(f'Reading data from: {pickle_name1}')
+        # print(feed.data[list(feed.data.keys())[0]].columns)
+        for ticker in feed.data:
+            df = feed.data[ticker]
+            feed.data[ticker], _, _ = add_features(df, columns_to_use=['row_num'])
+            
+        feed.ndata={}
+        for t in feed.tickers:
+            print(f'[INFO] On ticker={t}')
+            dfa=feed.data[t]
+            dfL=[]
+            feed.ndata[t]={}
+            for d in dfa['Date'].unique():
+                pdt=pd.to_datetime(d)
+                pdtp=pdt-IBDay(1)
+                df=dfa.loc[(pd.to_datetime(dfa['Date'])<=pdt)&
+                            (pd.to_datetime(dfa['Date'])>=pdtp)]
+                df['row_num'] = np.arange(len(df))
+                df=df[~df.index.duplicated(keep='first')]
+                df=df.sort_index()
+                dfc=df.loc[df['Date']==d]
+                feed.offsets[t][d]=df.shape[0]-dfc.shape[0]
+                feed.ndata[t][d]=df
+        
     else:
         feed = pickle.load(open(os.path.join('..', 'algodata', 'realdata', pickle_name2), 'rb'))
+        print('Processing....')
         add_addl_features_feed(feed,tickers=feed.tickers)
         add_sym_feature_feed(feed,tickers=feed.tickers)
+        print('Adding new features....')
         for ticker in feed.data:
             df = feed.data[ticker]
             feed.data[ticker], _, _ = add_features(df, columns_to_use=cols_to_use)
-            
+        
+                
     for model_name in models:
+        print(model_name)
         if model_name not in final_data:
             final_data[model_name] = []
             
-        bt=Backtest(feed,tickers=feed.tickers,add_features=True,target=.001,stop=.01,txcost=0.001,
-                    loc_exit=True,scan=False,topk=5,deploy=True,save_dfs=False)
+        bt=Backtest(feed,tickers=feed.tickers,add_features=False,target=.001,stop=.01,txcost=0.001,
+                    loc_exit=True,scan=True,topk=5,deploy=True,save_dfs=False)
         dtStrat = DTStrat(model_path=f'saved_models/{model_name}')
         ans = []
 

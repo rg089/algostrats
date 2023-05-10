@@ -1,3 +1,5 @@
+modelname: 'hp_11.pth'
+
 training_steps: 700000
 synthetic: true
 simple: true
@@ -9,5 +11,18 @@ loadfeed: false
 datafeed: false
 deploy: true
 use_alt: false
-datafile: ''
-datafile_test: ''
+datafile: ['']
+old_features: True
+new_features: False
+
+modify_name: false
+datafile_test: [
+          # 'realdata/augdata_01-Dec-2021_5m.csv', 
+          # 'realdata/augdata_01-Jan-2022_5m.csv',
+          # 'realdata/augdata_03-Feb-2022_5m.csv',
+          # 'realdata/augdata_02-Mar-2022_5m.csv', 
+          # 'realdata/augdata_04-Apr-2022_5m.csv', 
+          # 'realdata/augdata_02-May-2022_5m.csv',  
+          # 'realdata/augdata_04-Jul-2022_5m.csv',
+          # 'realdata/augdata_16-Dec-2022_5m.csv',
+          'realdata/alldata.csv']

@@ -1,0 +1,40 @@
+# Common
+modelname: 'RLC0_new.pth'
+
+# Train
+
+training_steps: 500000
+synthetic: false
+simple: false
+epochs: 1
+weeks: 20
+win: 5
+features: [0,1,2]
+top_k: 50
+loadfeed: false
+datafeed: true
+deploy: true
+use_alt: false
+datafile: ['realdata/alldata.csv']
+old_features: false
+new_features: true
+create_feed: false
+dynamic_test_features: false
+use_prediscrete: false
+use_normalized: true
+
+# Test
+
+datafile_test: [
+          # 'realdata/augdata_01-Dec-2021_5m.csv', 
+          # 'realdata/augdata_01-Jan-2022_5m.csv',
+          # 'realdata/augdata_03-Feb-2022_5m.csv',
+          # 'realdata/augdata_02-Mar-2022_5m.csv', 
+          # 'realdata/augdata_04-Apr-2022_5m.csv', 
+          # 'realdata/augdata_02-May-2022_5m.csv',  
+          # 'realdata/augdata_04-Jul-2022_5m.csv',
+          # 'realdata/augdata_16-Dec-2022_5m.csv',
+          'realdata/alldata.csv'
+          ]
+
+# model_suffixes: ['']
